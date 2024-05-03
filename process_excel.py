@@ -17,6 +17,9 @@ def process_excel(file_path):
     # Iteriere über die Zellen im Arbeitsblatt
     for row in worksheet.iter_rows(min_row=7):
         cell = row[0]
+        cell_yes = row[22]
+        if cell_yes == 1:
+            continue
         if cell.value == "Template":
             break
         # Überprüfe, ob die Zelle einen Hyperlink enthält
