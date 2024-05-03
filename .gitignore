@@ -1,0 +1,20 @@
+# Visual Studio Code
+.vscode/
+
+# PyCharm
+.idea/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyd
+*.pyo
+*.pyz
+*.pyzw
+
+# Environment directories
+.env/
+.venv/
+/env/
+/venv/
+ENV/
