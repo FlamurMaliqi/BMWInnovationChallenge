@@ -19,9 +19,33 @@ def git_commit(repo_dir, commit_message):
 
 def git_status(repo_dir):
     repo = Repo(repo_dir)
-    return repo.git.status()
+    status_output = repo.git.status('--porcelain')
+    lines = status_output.split('\n')
+    status_dict = {}
+    for line in lines:
+        if line:
+            status_code, file_path = line.split(maxsplit=1)
+            status_dict[file_path] = status_code
+    return status_dict
 
 
 if __name__ == '__main__':
-    git_add('.')
+    '''
+    Porcelain format:
+        ' ' = unmodified
+    
+        M = modified
+    
+        T = file type changed (regular file, symbolic link or submodule)
+    
+        A = added
+    
+        D = deleted
+    
+        R = renamed
+    
+        C = copied (if config option status.renames is set to "copies")
+    
+        U = updated but unmerged
+    '''
     print(git_status('.'))
