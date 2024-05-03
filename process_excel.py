@@ -1,7 +1,9 @@
 import openpyxl
+import os
 
 # Pfad zur Excel-Datei
 file_path = 'test_file.xlsx'
+
 
 def process_excel(file_path):
     # Öffne die Excel-Datei
@@ -10,29 +12,48 @@ def process_excel(file_path):
     # Wähle das erste Arbeitsblatt aus
     worksheet = workbook["Übersicht-Overview"]
 
-    relativ_path = 'test-dictionary/'
-    list_of_paths = []
+    dict_of_paths = {}
 
     father_path = ''
     # Iteriere über die Zellen im Arbeitsblatt
     for row in worksheet.iter_rows(min_row=7):
         cell = row[0]
-        cell_yes = row[22]
-        if cell_yes == 1:
-            continue
-        if cell.value == "Template":
-            break
-        # Überprüfe, ob die Zelle einen Hyperlink enthält
-        if cell.value:
-            if '. ' in cell.value:
-                father_path = 'Band_' + cell.value.replace('. ', '-').replace(' ', '_').replace('&', 'und') 
-                continue
+        cell_yes = row[24]
+        cell_file_extension = row[23]
+
+        if cell.value and cell_yes.value == "Yes":
+            if '.' in cell.value:
+                father_path = 'Band_' + cell.value.replace('.', '-').replace(' ', '_').replace('&', 'und')
             path = father_path + '/' + cell.value.replace(' ', '_')
-            list_of_paths.append(path)
+            dict_of_paths[path] = cell_file_extension.value
 
     workbook.close()
-    return list_of_paths
-            
-    # Schließe die Excel-Datei
+    return dict_of_paths
 
-print(process_excel(file_path))
+
+def check_files_exist(file_paths):
+    """
+    Check if the directories at the given paths contain a file with the given extension.
+
+    Parameters:
+    file_paths (list): A list of directory paths.
+    file_extension (str): The file extension to check for.
+
+    Returns:
+    dict: A dictionary where the keys are the directory paths and the values are booleans indicating whether the directory contains a file with the given extension.
+    """
+    result = {}
+    for path, file_extension in file_paths.items():
+        if os.path.exists(path):
+            for file in os.listdir(path):
+                if os.path.splitext(file)[1] == file_extension:
+                    result[path] = True
+                    break
+            else:
+                result[path] = False
+        else:
+            result[path] = False
+    return result
+
+
+print(check_files_exist(process_excel(file_path)))
