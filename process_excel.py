@@ -22,10 +22,10 @@ def process_excel(file_path):
         cell_file_extension = row[23]
 
         if cell.value and cell_yes.value == "Yes":
-            if '.' in cell.value:
-                father_path = 'Band_' + cell.value.replace('.', '-').replace(' ', '_').replace('&', 'und')
             path = father_path + '/' + cell.value.replace(' ', '_')
             dict_of_paths[path] = cell_file_extension.value
+        elif cell.value:
+            father_path = 'Band_' + cell.value.replace('.', '-').replace(' ', '_').replace('&', 'und')
 
     workbook.close()
     return dict_of_paths
@@ -44,6 +44,7 @@ def check_files_exist(file_paths):
     """
     result = {}
     for path, file_extension in file_paths.items():
+        path = "test_directionary/" + path
         if os.path.exists(path):
             for file in os.listdir(path):
                 if os.path.splitext(file)[1] == file_extension:
@@ -57,3 +58,4 @@ def check_files_exist(file_paths):
 
 
 print(check_files_exist(process_excel(file_path)))
+#print(process_excel(file_path))
