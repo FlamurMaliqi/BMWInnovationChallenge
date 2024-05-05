@@ -70,6 +70,50 @@ def git_status(repo_dir):
     return status_dict
 
 
+def git_diff(repo_dir, file_path):
+    """
+    Perform a git diff on a specific file in the given repository.
+
+    Parameters:
+    repo_dir (str): The directory of the repository.
+    file_path (str): The path to the file to diff, relative to the repository root.
+
+    Returns:
+    str: The output of the git diff command.
+    """
+    repo = Repo(repo_dir)
+    diff_index = repo.index.diff(None)
+    diffs = diff_index.iter_change_type('M')
+    #diffs = [d for d in diff_index.iter_change_type('M') if d.a_path == file_path or d.b_path == file_path]
+    #assert diffs.__len__() == 1
+    return diffs
+
+
+def format_diff(diff):
+    """
+    Format a Diff object into a human-readable string.
+
+    Parameters:
+    diff (git.Diff): The Diff object to format.
+
+    Returns:
+    str: A string describing the changes.
+    """
+    lines = []
+    if diff.renamed_file:
+        lines.append(f"File renamed from {diff.a_path} to {diff.b_path}")
+    else:
+        lines.append(f"Changes to file {diff.a_path}")
+
+    for line in diff.diff.splitlines():
+        if line.startswith('-'):
+            lines.append(f"Removed: {line[1:]}")
+        elif line.startswith('+'):
+            lines.append(f"Added: {line[1:]}")
+
+    return '\n'.join(lines)
+
+
 if __name__ == '__main__':
     '''
     Porcelain format:
@@ -89,4 +133,6 @@ if __name__ == '__main__':
 
         U = updated but unmerged
     '''
-    print(git_status('.'))
+    diff = git_diff('.', 'process_excel.py')
+    for i in diff:
+        print(format_diff(i))
